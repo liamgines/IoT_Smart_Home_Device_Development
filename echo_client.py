@@ -1,6 +1,16 @@
 import socket
 import ipaddress
 
+VALID_QUERIES = ["What is the average moisture inside my kitchen fridge in the past three hours?",
+                 "What is the average water consumption per cycle in my smart dishwasher?",
+                 "Which device consumed more electricity among my three IoT devices (two refrigerators and a dishwasher)?"]
+
+
+def output_query_options():
+    for i in range(len(VALID_QUERIES)):
+        print(f"{i+1}. {VALID_QUERIES[i]}")
+    print()
+
 # Loop to ensure that the user inputs a valid IP address for the Server
 while True:
     try:
@@ -38,8 +48,17 @@ while True:
 
 # Loop for client to repeatedly send and receive messages between itself and the Server
 while True:
+    output_query_options()
     # User inputs a message to send to the server
     message = input("Input a Message to Send to the Server: ")
+
+    if message in ["1", "2", "3"]:
+        query_index = int(message) - 1
+        message = VALID_QUERIES[query_index]
+    if message not in VALID_QUERIES:
+        print("\nSorry, this query cannot be processed. Please try one of the following:\n")
+        continue
+
     # Sends message to Server over communication link
     client.send(bytearray(str(message), encoding="utf-8"))
 
