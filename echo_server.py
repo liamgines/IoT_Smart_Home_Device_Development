@@ -18,9 +18,12 @@ FIRST_FRIDGE_ID = "id4-6e4-ls8-f7q"
 DISHWASHER_ID = "7pz-ybr-8s0-6h3"
 SECOND_FRIDGE_ID = "27a451a2-eac4-471d-8cf7-de13d8900eaf"
 
+last_known_record_id = 0
+
 def get_client_requested_data(query_index):
+    global last_known_record_id
     # Fetches data from Neon database
-    cursor.execute('select PAYLOAD, TIME from "Assignment #8 Destination Table_virtual"')
+    cursor.execute(f'select PAYLOAD, TIME, ID from "Assignment #8 Destination Table_virtual" WHERE ID > {last_known_record_id}')
     selected_rows = cursor.fetchall()
 
     if query_index == 0:
@@ -29,10 +32,11 @@ def get_client_requested_data(query_index):
         for row in selected_rows:
             current_payload = row[0]
             current_creation_time = row[1]
+            last_known_record_id = max(last_known_record_id, row[2])
             if current_payload["parent_asset_uid"] == FIRST_FRIDGE_ID:
                 time_diff = datetime.now(timezone.utc) - current_creation_time
                 # Skips; doesn't account for data not within the past 3 hours
-                if time_diff.seconds <= SECONDS_PER_THREE_HOURS:
+                if time_diff.seconds < SECONDS_PER_THREE_HOURS:
                     continue
                 moisture_measurement = current_payload["Moisture Meter - Moisture Meter (Fridge)"]
                 moisture_measurement = float(moisture_measurement)
