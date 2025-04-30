@@ -55,7 +55,7 @@ while True:
     if message in ["1", "2", "3"]:
         query_index = int(message) - 1
         message = VALID_QUERIES[query_index]
-    if message not in VALID_QUERIES:
+    if message not in VALID_QUERIES and message != "":
         print("\nSorry, this query cannot be processed. Please try one of the following:\n")
         continue
 
