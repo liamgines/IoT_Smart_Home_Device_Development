@@ -3,7 +3,12 @@ import psycopg2
 import sys
 import os
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timezone
+
+THREE_HOURS = 3
+MINUTES_PER_HOUR = 60
+SECONDS_PER_MINUTE = 60
+SECONDS_PER_THREE_HOURS = THREE_HOURS * MINUTES_PER_HOUR * SECONDS_PER_MINUTE
 
 VALID_QUERIES = ["What is the average moisture inside my kitchen fridge in the past three hours?",
                  "What is the average water consumption per cycle in my smart dishwasher?",
@@ -15,28 +20,30 @@ SECOND_FRIDGE_ID = "27a451a2-eac4-471d-8cf7-de13d8900eaf"
 
 def get_client_requested_data(query_index):
     # Fetches data from Neon database
-    cursor.execute('select PAYLOAD from "Assignment #8 Destination Table_virtual"')
+    cursor.execute('select PAYLOAD, TIME from "Assignment #8 Destination Table_virtual"')
     selected_rows = cursor.fetchall()
-    print(selected_rows)
 
     if query_index == 0:
         moisture_measurements = []
 
         for row in selected_rows:
             current_payload = row[0]
+            current_creation_time = row[1]
             if current_payload["parent_asset_uid"] == FIRST_FRIDGE_ID:
-                cursor.execute(f'SELECT TIME FROM "Assignment #8 Destination Table_virtual" WHERE ID={FIRST_FRIDGE_ID}')
-                creation_time = datetime.fromisoformat(cursor.fetchone())
-                time_diff = datetime.now() - creation_time
+                time_diff = datetime.now(timezone.utc) - current_creation_time
                 # Skips; doesn't account for data not within the past 3 hours
-                if time_diff.min > 180:
+                if time_diff.seconds <= SECONDS_PER_THREE_HOURS:
                     continue
                 moisture_measurement = current_payload["Moisture Meter - Moisture Meter (Fridge)"]
                 moisture_measurement = float(moisture_measurement)
                 moisture_measurements.append(moisture_measurement)
 
-        average_moisture_inside_first_fridge_in_past_three_hours = sum(moisture_measurements) / len(moisture_measurements)
-        client_requested_data = f"Average moisture inside my kitchen fridge in the past three hours: {average_moisture_inside_first_fridge_in_past_three_hours:.3f}% Relative Humidity"
+        if len(moisture_measurements):
+            average_moisture_inside_first_fridge_in_past_three_hours = sum(moisture_measurements) / len(moisture_measurements)
+            client_requested_data = f"Average moisture inside my kitchen fridge in the past three hours: {average_moisture_inside_first_fridge_in_past_three_hours:.2f}% Relative Humidity"
+
+        else:
+            client_requested_data = f"Fridge did not produce any moisture data within the past three hours"
 
     elif query_index == 1:
         raise NotImplementedError
@@ -79,10 +86,10 @@ while True:
     message_from_client = str((client.recv(1024)).decode())
     print(f"Message from Client: {message_from_client}")
 
-    try:
+    if message_from_client in VALID_QUERIES:
         query_index = VALID_QUERIES.index(message_from_client)
         server_message = get_client_requested_data(query_index)
-    except:
+    else:
         # Modifies the client message received to be all uppercased
         server_message = message_from_client.upper()
 
