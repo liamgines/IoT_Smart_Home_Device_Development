@@ -38,7 +38,7 @@ def get_client_requested_data(query_index):
                 moisture_measurement = float(moisture_measurement)
                 moisture_measurements.append(moisture_measurement)
 
-        if len(moisture_measurements):
+        if moisture_measurements:
             average_moisture_inside_first_fridge_in_past_three_hours = sum(moisture_measurements) / len(moisture_measurements)
             client_requested_data = f"Average moisture inside my kitchen fridge in the past three hours: {average_moisture_inside_first_fridge_in_past_three_hours:.2f}% Relative Humidity"
 
