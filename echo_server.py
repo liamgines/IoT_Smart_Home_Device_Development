@@ -4,24 +4,54 @@ import sys
 import os
 from dotenv import load_dotenv
 
+VALID_QUERIES = ["What is the average moisture inside my kitchen fridge in the past three hours?",
+                 "What is the average water consumption per cycle in my smart dishwasher?",
+                 "Which device consumed more electricity among my three IoT devices (two refrigerators and a dishwasher)?"]
+
+FIRST_FRIDGE_ID = "id4-6e4-ls8-f7q"
+DISHWASHER_ID = "7pz-ybr-8s0-6h3"
+SECOND_FRIDGE_ID = "27a451a2-eac4-471d-8cf7-de13d8900eaf"
+
+def get_client_requested_data(query_index):
+    # Fetches data from Neon database
+    cursor.execute('select PAYLOAD from "Assignment #8 Destination Table_virtual"')
+    selected_rows = cursor.fetchall()
+
+    if query_index == 0:
+        moisture_measurements = []
+        for row in selected_rows:
+            current_payload = row[0]
+            if current_payload["parent_asset_uid"] == FIRST_FRIDGE_ID:
+                moisture_measurement = current_payload["Moisture Meter - Moisture Meter (Fridge)"]
+                moisture_measurement = float(moisture_measurement)
+                moisture_measurements.append(moisture_measurement)
+
+        average_moisture_inside_first_fridge_in_past_three_hours = sum(moisture_measurements) / len(moisture_measurements)
+        client_requested_data = f"Average moisture inside my kitchen fridge in the past three hours: {average_moisture_inside_first_fridge_in_past_three_hours:.3f}% Relative Humidity"
+
+    elif query_index == 1:
+        raise NotImplementedError
+
+    elif query_index == 2:
+        raise NotImplementedError
+
+    else:
+        assert False
+        # raise ValueError
+
+    return client_requested_data
+
 # Obtains access to connection string safely
 load_dotenv()
-db_connection_str = psycopg2.connect(os.getenv("DATABASE_CONNECTION_STRING"))
+DATABASE_CONNECTION_STRING = psycopg2.connect(os.getenv("DATABASE_CONNECTION_STRING"))
 
 # Tests connection to Neon
-if db_connection_str:
+if DATABASE_CONNECTION_STRING:
     print("Connection with Neon successful!")
 else:
     print("Nothing happened...")
 
-
-# Fetches data from Neon database
-cursor = db_connection_str.cursor()
-cursor.execute('select PAYLOAD from "Assignment 7 Demo Table_virtual"')
-queries = cursor.fetchall()
-
-for query in queries:
-    print(query)
+cursor = DATABASE_CONNECTION_STRING.cursor()
 
 print("\nRunning server...")
 # Creates socket for network communication using IPV4 and TCP
@@ -41,8 +71,12 @@ while True:
     message_from_client = str((client.recv(1024)).decode())
     print(f"Message from Client: {message_from_client}")
 
-    # Modifies the client message received to be all uppercased
-    server_message = message_from_client.upper()
+    try:
+        query_index = VALID_QUERIES.index(message_from_client)
+        server_message = get_client_requested_data(query_index)
+    except:
+        # Modifies the client message received to be all uppercased
+        server_message = message_from_client.upper()
 
     # Indicates Server-Client communication should cease
     if message_from_client == "":
@@ -56,5 +90,5 @@ client.close()
 print("Shutting down communications on server side...")
 
 # Closes connection with Neon database
-db_connection_str.close()
+DATABASE_CONNECTION_STRING.close()
 print("Shutting down connection with Neon...")
