@@ -36,8 +36,7 @@ def get_client_requested_data(query_index):
         raise NotImplementedError
 
     else:
-        assert False
-        # raise ValueError
+        raise ValueError
 
     return client_requested_data
 
