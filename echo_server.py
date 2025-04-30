@@ -3,6 +3,7 @@ import psycopg2
 import sys
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 VALID_QUERIES = ["What is the average moisture inside my kitchen fridge in the past three hours?",
                  "What is the average water consumption per cycle in my smart dishwasher?",
@@ -16,12 +17,20 @@ def get_client_requested_data(query_index):
     # Fetches data from Neon database
     cursor.execute('select PAYLOAD from "Assignment #8 Destination Table_virtual"')
     selected_rows = cursor.fetchall()
+    print(selected_rows)
 
     if query_index == 0:
         moisture_measurements = []
+
         for row in selected_rows:
             current_payload = row[0]
             if current_payload["parent_asset_uid"] == FIRST_FRIDGE_ID:
+                cursor.execute(f'SELECT TIME FROM "Assignment #8 Destination Table_virtual" WHERE ID={FIRST_FRIDGE_ID}')
+                creation_time = datetime.fromisoformat(cursor.fetchone())
+                time_diff = datetime.now() - creation_time
+                # Skips; doesn't account for data not within the past 3 hours
+                if time_diff.min > 180:
+                    continue
                 moisture_measurement = current_payload["Moisture Meter - Moisture Meter (Fridge)"]
                 moisture_measurement = float(moisture_measurement)
                 moisture_measurements.append(moisture_measurement)
