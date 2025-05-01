@@ -63,10 +63,10 @@ def get_client_requested_data(query_index):
             client_requested_data = f"Smart Dishwasher did not produce any water consumption data yet"
 
     elif query_index == 2:
-        raise NotImplementedError
+        client_requested_data = f"Functionality not implemented yet"
 
     else:
-        raise ValueError
+        client_requested_data = f"Functionality not implemented yet"
 
     return client_requested_data
 
