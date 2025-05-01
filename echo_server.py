@@ -63,10 +63,34 @@ def get_client_requested_data(query_index):
             client_requested_data = f"Smart Dishwasher did not produce any water consumption data yet"
 
     elif query_index == 2:
-        client_requested_data = f"Functionality not implemented yet"
+        electricity_consumption_by_device_id = {FIRST_FRIDGE_ID : 0, DISHWASHER_ID : 0, SECOND_FRIDGE_ID : 0}
+        for row in selected_rows:
+            current_payload = row[0]
+            current_device_id = current_payload["parent_asset_uid"]
+            
+            if current_device_id == FIRST_FRIDGE_ID:
+                electricity_consumption_by_device_id[FIRST_FRIDGE_ID] += float(current_payload["ACS712 - ACS712 - Ammeter (Fridge)"])
+            elif current_device_id == DISHWASHER_ID:
+                electricity_consumption_by_device_id[DISHWASHER_ID] += float(current_payload["ACS712 - Ammeter (Dishwasher)"])
+            elif current_device_id == SECOND_FRIDGE_ID:
+                electricity_consumption_by_device_id[SECOND_FRIDGE_ID] += float(current_payload["sensor 1 27a451a2-eac4-471d-8cf7-de13d8900eaf"])
+
+        most_power_hungry_device_id = False
+        most_electricity_consumed = 0
+        for device_id in electricity_consumption_by_device_id:
+            current_electricity_consumed = electricity_consumption_by_device_id[device_id]
+            most_electricity_consumed = max(most_electricity_consumed, current_electricity_consumed)
+
+        client_requested_data = f""
+        for device_id in electricity_consumption_by_device_id:
+            current_electricity_consumed = electricity_consumption_by_device_id[device_id]
+            if current_electricity_consumed == most_electricity_consumed:
+                client_requested_data += f"{device_id}, "
+
+        client_requested_data += f"consumed the most electricity among all my devices at {most_electricity_consumed:.2f} kWh (kilowatts per hour)"
 
     else:
-        client_requested_data = f"Functionality not implemented yet"
+        raise ValueError
 
     return client_requested_data
 
