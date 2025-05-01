@@ -32,7 +32,7 @@ def get_client_requested_data(query_index):
             if current_payload["parent_asset_uid"] == FIRST_FRIDGE_ID:
                 time_diff = datetime.now(timezone.utc) - current_creation_time
                 # Skips; doesn't account for data not within the past 3 hours
-                if time_diff.seconds <= SECONDS_PER_THREE_HOURS:
+                if time_diff.seconds > SECONDS_PER_THREE_HOURS:
                     continue
                 moisture_measurement = current_payload["Moisture Meter - Moisture Meter (Fridge)"]
                 moisture_measurement = float(moisture_measurement)
@@ -46,7 +46,21 @@ def get_client_requested_data(query_index):
             client_requested_data = f"Fridge did not produce any moisture data within the past three hours"
 
     elif query_index == 1:
-        raise NotImplementedError
+        water_consumption_measurements = []
+
+        for row in selected_rows:
+            current_payload = row[0]
+            if current_payload["parent_asset_uid"] == DISHWASHER_ID:
+                water_consumption_measurement = current_payload["YF-S201 - Water Consumption Sensor (Dishwasher)"]
+                water_consumption_measurement = float(water_consumption_measurement)
+                water_consumption_measurements.append(water_consumption_measurement)
+
+        if water_consumption_measurements:
+            average_water_consumption_per_cycle_in_dishwasher = sum(water_consumption_measurements) / len(water_consumption_measurements)
+            client_requested_data = f"Average water consumption per cycle in my smart dishwasher: {average_water_consumption_per_cycle_in_dishwasher:.2f} gallons"
+
+        else:
+            client_requested_data = f"Smart Dishwasher did not produce any water consumption data yet"
 
     elif query_index == 2:
         raise NotImplementedError
