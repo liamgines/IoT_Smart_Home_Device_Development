@@ -18,6 +18,8 @@ FIRST_FRIDGE_ID = "id4-6e4-ls8-f7q"
 DISHWASHER_ID = "7pz-ybr-8s0-6h3"
 SECOND_FRIDGE_ID = "27a451a2-eac4-471d-8cf7-de13d8900eaf"
 
+device_name_lookup = { FIRST_FRIDGE_ID: "Kitchen Fridge", DISHWASHER_ID: "Smart Dishwasher", SECOND_FRIDGE_ID: "Second Fridge" }
+
 def get_client_requested_data(query_index):
     # Fetches data from Neon database
     cursor.execute('select PAYLOAD, TIME from "Assignment #8 Destination Table_virtual"')
@@ -40,10 +42,10 @@ def get_client_requested_data(query_index):
 
         if moisture_measurements:
             average_moisture_inside_first_fridge_in_past_three_hours = sum(moisture_measurements) / len(moisture_measurements)
-            client_requested_data = f"Average moisture inside my kitchen fridge in the past three hours: {average_moisture_inside_first_fridge_in_past_three_hours:.2f}% Relative Humidity"
+            client_requested_data = f"Average moisture inside {device_name_lookup[FIRST_FRIDGE_ID]} in the past three hours: {average_moisture_inside_first_fridge_in_past_three_hours:.2f}% Relative Humidity"
 
         else:
-            client_requested_data = f"Fridge did not produce any moisture data within the past three hours"
+            client_requested_data = f"{device_name_lookup[FIRST_FRIDGE_ID]} did not produce any moisture data within the past three hours"
 
     elif query_index == 1:
         water_consumption_measurements = []
@@ -57,10 +59,10 @@ def get_client_requested_data(query_index):
 
         if water_consumption_measurements:
             average_water_consumption_per_cycle_in_dishwasher = sum(water_consumption_measurements) / len(water_consumption_measurements)
-            client_requested_data = f"Average water consumption per cycle in my smart dishwasher: {average_water_consumption_per_cycle_in_dishwasher:.2f} gallons"
+            client_requested_data = f"Average water consumption per cycle in {device_name_lookup[DISHWASHER_ID]}: {average_water_consumption_per_cycle_in_dishwasher:.2f} gallons"
 
         else:
-            client_requested_data = f"Smart Dishwasher did not produce any water consumption data yet"
+            client_requested_data = f"{device_name_lookup[DISHWASHER_ID]} did not produce any water consumption data yet"
 
     elif query_index == 2:
         electricity_consumption_by_device_id = {FIRST_FRIDGE_ID : 0, DISHWASHER_ID : 0, SECOND_FRIDGE_ID : 0}
@@ -85,9 +87,9 @@ def get_client_requested_data(query_index):
         for device_id in electricity_consumption_by_device_id:
             current_electricity_consumed = electricity_consumption_by_device_id[device_id]
             if current_electricity_consumed == most_electricity_consumed:
-                client_requested_data += f"{device_id}, "
+                client_requested_data += f"{device_name_lookup[device_id]}, "
 
-        client_requested_data += f"consumed the most electricity among all my devices at {most_electricity_consumed:.2f} kWh (kilowatts per hour)"
+        client_requested_data += f"consumed the most electricity among all devices at {most_electricity_consumed:.2f} kWh (kilowatts per hour)"
 
     else:
         raise ValueError
