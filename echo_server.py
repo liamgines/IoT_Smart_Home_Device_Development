@@ -20,6 +20,11 @@ SECOND_FRIDGE_ID = "27a451a2-eac4-471d-8cf7-de13d8900eaf"
 
 device_name_lookup = { FIRST_FRIDGE_ID: "Kitchen Fridge", DISHWASHER_ID: "Smart Dishwasher", SECOND_FRIDGE_ID: "Second Fridge" }
 
+def liters_to_gallons(liters):
+    GALLONS_PER_LITER = 0.264172
+    gallons = liters * GALLONS_PER_LITER
+    return gallons
+
 def get_client_requested_data(query_index):
     # Fetches data from Neon database
     cursor.execute('select PAYLOAD, TIME from "Assignment #8 Destination Table_virtual"')
@@ -59,7 +64,7 @@ def get_client_requested_data(query_index):
 
         if water_consumption_measurements:
             average_water_consumption_per_cycle_in_dishwasher = sum(water_consumption_measurements) / len(water_consumption_measurements)
-            client_requested_data = f"Average water consumption per cycle in {device_name_lookup[DISHWASHER_ID]}: {average_water_consumption_per_cycle_in_dishwasher:.2f} gallons"
+            client_requested_data = f"Average water consumption per cycle in {device_name_lookup[DISHWASHER_ID]}: {liters_to_gallons(average_water_consumption_per_cycle_in_dishwasher):.2f} gallons per minute"
 
         else:
             client_requested_data = f"{device_name_lookup[DISHWASHER_ID]} did not produce any water consumption data yet"
