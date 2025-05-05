@@ -5,6 +5,9 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timezone
 
+largest_known_id = 0
+selected_rows = []
+
 THREE_HOURS = 3
 MINUTES_PER_HOUR = 60
 SECONDS_PER_MINUTE = 60
@@ -44,14 +47,18 @@ def seconds_to_hours(seconds):
     return hours
 
 def get_client_requested_data(query_index):
+    global largest_known_id
+    global selected_rows
     # Fetches data from Neon database
-    cursor.execute('select PAYLOAD, TIME from "Assignment #8 Destination Table_virtual"')
-    selected_rows = cursor.fetchall()
+    cursor.execute(f'select PAYLOAD, TIME, ID from "Assignment #8 Destination Table_virtual" WHERE ID > {largest_known_id}')
+    selected_rows = selected_rows + cursor.fetchall()
 
     if query_index == 0:
         moisture_measurements = []
 
         for row in selected_rows:
+            largest_known_id = max(largest_known_id, row[2]) 
+
             current_payload = row[0]
             current_creation_time = row[1]
             if current_payload["parent_asset_uid"] == FIRST_FRIDGE_ID:
@@ -74,6 +81,8 @@ def get_client_requested_data(query_index):
         water_consumption_measurements = []
 
         for row in selected_rows:
+            largest_known_id = max(largest_known_id, row[2]) 
+
             current_payload = row[0]
             if current_payload["parent_asset_uid"] == DISHWASHER_ID:
                 water_consumption_measurement = current_payload["YF-S201 - Water Consumption Sensor (Dishwasher)"]
@@ -100,6 +109,8 @@ def get_client_requested_data(query_index):
                                        SECOND_FRIDGE_ID : (datetime.now(timezone.utc),
                                                            datetime.min.replace(tzinfo=pytz.UTC))}
         for row in selected_rows:
+            largest_known_id = max(largest_known_id, row[2]) 
+
             current_payload = row[0]
             current_creation_time = row[1]
             current_device_id = current_payload["parent_asset_uid"]
