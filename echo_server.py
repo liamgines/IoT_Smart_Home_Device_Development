@@ -18,7 +18,9 @@ FIRST_FRIDGE_ID = "id4-6e4-ls8-f7q"
 DISHWASHER_ID = "7pz-ybr-8s0-6h3"
 SECOND_FRIDGE_ID = "27a451a2-eac4-471d-8cf7-de13d8900eaf"
 
-device_name_lookup = { FIRST_FRIDGE_ID: "Kitchen Fridge", DISHWASHER_ID: "Smart Dishwasher", SECOND_FRIDGE_ID: "Second Fridge" }
+device_name_lookup = { FIRST_FRIDGE_ID: "Kitchen Fridge",
+                      DISHWASHER_ID: "Smart Dishwasher",
+                      SECOND_FRIDGE_ID: "Second Fridge" }
 
 def liters_to_gallons(liters):
     GALLONS_PER_LITER = 0.264172
@@ -86,10 +88,17 @@ def get_client_requested_data(query_index):
             client_requested_data = f"{device_name_lookup[DISHWASHER_ID]} did not produce any water consumption data yet"
 
     elif query_index == 2:
-        electricity_consumption_by_device_id = {FIRST_FRIDGE_ID : 0, DISHWASHER_ID : 0, SECOND_FRIDGE_ID : 0}
+        electricity_consumption_by_device_id = {FIRST_FRIDGE_ID : 0,
+                                                DISHWASHER_ID : 0,
+                                                SECOND_FRIDGE_ID : 0}
         # https://stackoverflow.com/questions/56287435/convert-datetime-min-into-offset-aware-datetime
         import pytz
-        start_end_time_by_device_id = {FIRST_FRIDGE_ID : (datetime.now(timezone.utc), datetime.min.replace(tzinfo=pytz.UTC)), DISHWASHER_ID : (datetime.now(timezone.utc), datetime.min.replace(tzinfo=pytz.UTC)), SECOND_FRIDGE_ID : (datetime.now(timezone.utc), datetime.min.replace(tzinfo=pytz.UTC))}
+        start_end_time_by_device_id = {FIRST_FRIDGE_ID : (datetime.now(timezone.utc),
+                                                          datetime.min.replace(tzinfo=pytz.UTC)),
+                                       DISHWASHER_ID : (datetime.now(timezone.utc),
+                                                        datetime.min.replace(tzinfo=pytz.UTC)),
+                                       SECOND_FRIDGE_ID : (datetime.now(timezone.utc),
+                                                           datetime.min.replace(tzinfo=pytz.UTC))}
         for row in selected_rows:
             current_payload = row[0]
             current_creation_time = row[1]
@@ -97,20 +106,30 @@ def get_client_requested_data(query_index):
 
             if current_device_id == FIRST_FRIDGE_ID:
                 electricity_consumption_by_device_id[FIRST_FRIDGE_ID] += float(current_payload["ACS712 - ACS712 - Ammeter (Fridge)"])
-                start_end_time_by_device_id[FIRST_FRIDGE_ID] = (min(start_end_time_by_device_id[FIRST_FRIDGE_ID][0], current_creation_time), max(start_end_time_by_device_id[FIRST_FRIDGE_ID][1], current_creation_time))
+                start_end_time_by_device_id[FIRST_FRIDGE_ID] = (min(start_end_time_by_device_id[FIRST_FRIDGE_ID][0],
+                                                                    current_creation_time),
+                                                                max(start_end_time_by_device_id[FIRST_FRIDGE_ID][1],
+                                                                    current_creation_time))
 
             elif current_device_id == DISHWASHER_ID:
                 electricity_consumption_by_device_id[DISHWASHER_ID] += float(current_payload["ACS712 - Ammeter (Dishwasher)"])
 
-                start_end_time_by_device_id[DISHWASHER_ID] = (min(start_end_time_by_device_id[DISHWASHER_ID][0], current_creation_time), max(start_end_time_by_device_id[DISHWASHER_ID][1], current_creation_time))
+                start_end_time_by_device_id[DISHWASHER_ID] = (min(start_end_time_by_device_id[DISHWASHER_ID][0],
+                                                                  current_creation_time),
+                                                              max(start_end_time_by_device_id[DISHWASHER_ID][1],
+                                                                  current_creation_time))
 
             elif current_device_id == SECOND_FRIDGE_ID:
                 electricity_consumption_by_device_id[SECOND_FRIDGE_ID] += float(current_payload["sensor 1 27a451a2-eac4-471d-8cf7-de13d8900eaf"])
-                start_end_time_by_device_id[SECOND_FRIDGE_ID] = (min(start_end_time_by_device_id[SECOND_FRIDGE_ID][0], current_creation_time), max(start_end_time_by_device_id[SECOND_FRIDGE_ID][1], current_creation_time))
+                start_end_time_by_device_id[SECOND_FRIDGE_ID] = (min(start_end_time_by_device_id[SECOND_FRIDGE_ID][0],
+                                                                     current_creation_time),
+                                                                 max(start_end_time_by_device_id[SECOND_FRIDGE_ID][1],
+                                                                     current_creation_time))
 
         for device_id in electricity_consumption_by_device_id:
             current_device_run_time = start_end_time_by_device_id[device_id][1] - start_end_time_by_device_id[device_id][0]
-            electricity_consumption_by_device_id[device_id] = amps_to_kilowatt_hours(electricity_consumption_by_device_id[device_id], seconds_to_hours(current_device_run_time.seconds))
+            electricity_consumption_by_device_id[device_id] = amps_to_kilowatt_hours(electricity_consumption_by_device_id[device_id],
+                                                                                     seconds_to_hours(current_device_run_time.seconds))
 
         most_power_hungry_device_id = False
         most_electricity_consumed = 0
