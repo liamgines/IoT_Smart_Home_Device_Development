@@ -96,7 +96,7 @@ def get_client_requested_data(query_index):
         for device_id in electricity_consumption_by_device_id:
             current_electricity_consumed = electricity_consumption_by_device_id[device_id]
             if current_electricity_consumed == most_electricity_consumed:
-                client_requested_data += f"{device_name_lookup[device_id]} consumed the most electricity among all devices at {amps_to_kilowatts(most_electricity_consumed):.2f} kilowatts"
+                client_requested_data += f"{device_name_lookup[device_id]} consumed the most electricity among all devices at {amps_to_kilowatts(most_electricity_consumed):.2f} kilowatts\n"
 
     else:
         raise ValueError
