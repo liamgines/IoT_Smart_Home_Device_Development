@@ -87,7 +87,7 @@ def get_client_requested_data(query_index):
 
     elif query_index == 2:
         electricity_consumption_by_device_id = {FIRST_FRIDGE_ID : 0, DISHWASHER_ID : 0, SECOND_FRIDGE_ID : 0}
-        time_running_by_device_id = {FIRST_FRIDGE_ID : 0, DISHWASHER_ID : 0, SECOND_FRIDGE_ID : 0}
+        seconds_running_by_device_id = {FIRST_FRIDGE_ID : 0, DISHWASHER_ID : 0, SECOND_FRIDGE_ID : 0}
         for row in selected_rows:
             current_payload = row[0]
             current_creation_time = row[1]
@@ -97,18 +97,18 @@ def get_client_requested_data(query_index):
             
             if current_device_id == FIRST_FRIDGE_ID:
                 electricity_consumption_by_device_id[FIRST_FRIDGE_ID] += float(current_payload["ACS712 - ACS712 - Ammeter (Fridge)"])
-                time_running_by_device_id[FIRST_FRIDGE_ID] = max(time_running_by_device_id[FIRST_FRIDGE_ID], seconds_to_hours(time_diff.seconds))
+                seconds_running_by_device_id[FIRST_FRIDGE_ID] = max(seconds_running_by_device_id[FIRST_FRIDGE_ID], time_diff.seconds)
 
             elif current_device_id == DISHWASHER_ID:
                 electricity_consumption_by_device_id[DISHWASHER_ID] += float(current_payload["ACS712 - Ammeter (Dishwasher)"])
-                time_running_by_device_id[DISHWASHER_ID] = max(time_running_by_device_id[DISHWASHER_ID], seconds_to_hours(time_diff.seconds))
+                seconds_running_by_device_id[DISHWASHER_ID] = max(seconds_running_by_device_id[DISHWASHER_ID], time_diff.seconds)
 
             elif current_device_id == SECOND_FRIDGE_ID:
                 electricity_consumption_by_device_id[SECOND_FRIDGE_ID] += float(current_payload["sensor 1 27a451a2-eac4-471d-8cf7-de13d8900eaf"])
-                time_running_by_device_id[SECOND_FRIDGE_ID] = max(time_running_by_device_id[SECOND_FRIDGE_ID], seconds_to_hours(time_diff.seconds))
+                seconds_running_by_device_id[SECOND_FRIDGE_ID] = max(seconds_running_by_device_id[SECOND_FRIDGE_ID], time_diff.seconds)
 
         for device_id in electricity_consumption_by_device_id:
-            electricity_consumption_by_device_id[device_id] = amps_to_kilowatt_hours(electricity_consumption_by_device_id[device_id], time_running_by_device_id[device_id])
+            electricity_consumption_by_device_id[device_id] = amps_to_kilowatt_hours(electricity_consumption_by_device_id[device_id], seconds_to_hours(seconds_running_by_device_id[device_id]))
 
         most_power_hungry_device_id = False
         most_electricity_consumed = 0
