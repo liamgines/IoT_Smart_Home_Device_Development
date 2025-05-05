@@ -25,6 +25,10 @@ def liters_to_gallons(liters):
     gallons = liters * GALLONS_PER_LITER
     return gallons
 
+def amps_to_kilowatts(amps, volts=120):
+    kilowatts = amps * volts / 1000
+    return kilowatts
+
 def get_client_requested_data(query_index):
     # Fetches data from Neon database
     cursor.execute('select PAYLOAD, TIME from "Assignment #8 Destination Table_virtual"')
@@ -92,9 +96,7 @@ def get_client_requested_data(query_index):
         for device_id in electricity_consumption_by_device_id:
             current_electricity_consumed = electricity_consumption_by_device_id[device_id]
             if current_electricity_consumed == most_electricity_consumed:
-                client_requested_data += f"{device_name_lookup[device_id]}, "
-
-        client_requested_data += f"consumed the most electricity among all devices at {most_electricity_consumed:.2f} kWh (kilowatts per hour)"
+                client_requested_data += f"{device_name_lookup[device_id]} consumed the most electricity among all devices at {amps_to_kilowatts(most_electricity_consumed):.2f} kilowatts"
 
     else:
         raise ValueError
