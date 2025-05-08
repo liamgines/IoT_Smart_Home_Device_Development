@@ -4,6 +4,7 @@ import sys
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timezone
+import pytz
 
 largest_known_id = 0
 selected_rows = []
@@ -101,7 +102,6 @@ def get_client_requested_data(query_index):
                                                 DISHWASHER_ID : 0,
                                                 SECOND_FRIDGE_ID : 0}
         # https://stackoverflow.com/questions/56287435/convert-datetime-min-into-offset-aware-datetime
-        import pytz
         start_end_time_by_device_id = {FIRST_FRIDGE_ID : (datetime.now(timezone.utc),
                                                           datetime.min.replace(tzinfo=pytz.UTC)),
                                        DISHWASHER_ID : (datetime.now(timezone.utc),
