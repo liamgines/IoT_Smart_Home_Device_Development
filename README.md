@@ -1,5 +1,11 @@
 ## Before You Begin
 Make sure that you have Python installed on both machines. If not, install them from [python.org](https://www.python.org/).
+Once Python is installed, type in ```cmd``` in Windows Search (assuming you are working on a Windows machine) and open "Command Prompt". Then run the following command(s) to install various dependencies:
+```
+pip install pytz
+pip install dotenv
+pip install psycopg2
+```
 
 ## Database
 Create an account on [Neon](https://console.neon.tech) if you haven't already. Once done, create a database and grab
