@@ -1,23 +1,27 @@
 ## Before You Begin
-Make sure that you have python installed on both machines. If not, install them from https://www.python.org/.
+Make sure that you have Python installed on both machines. If not, install them from [python.org](https://www.python.org/).
 
 ## Database
-Create an account on Neon if you haven't already (https://console.neon.tech). Once done, create a database, grab
-the connection string, and paste the connection string in a .env file in the local folder where echo_client.py
-and echo_server.py are stored. Afterwards, populate the database with data by turning on all the switches to
-generate data on Dataniz (follow the instructions listed on Dataniz).
+Create an account on [Neon](https://console.neon.tech) if you haven't already. Once done, create a database and grab
+the connection string. Create a file named ```.env``` containing this connection string in the following format:
+```
+DATABASE_CONNECTION_STRING=paste_connection_string_here
+```
+The ```.env``` file must be stored in the same folder as ```echo_server.py```. Afterwards, populate the database with generated data by turning on all the switches in Dataniz (Follow the instructions listed on Dataniz).
 
 ## Run Server
-Type in "cmd" in the window taskbar (assuming you are working on a Windows machine) and open the "Command Prompt".
-Use the "cd" command to navigate to the directory storing echo_server.py. Type:
-```python ./echo_server.py (insert IP address here) (insert port number here)``` and hit enter. If the .env file
-specified earlier exists in the same folder and has the correct database connection string, the server should
-connect.
+Type in ```cmd``` in Windows Search (assuming you are working on a Windows machine) and open "Command Prompt".
+Use the ```cd``` command to navigate to the directory storing ```echo_server.py```. Then run the command:
+```
+python ./echo_server.py <insert server IP address here> <insert port number here>
+```
+If the ```.env``` file specified earlier exists in the same folder and contains the correct database connection string, the server should
+be able to establish a connection with the database.
 
 ## Client
-Type in "cmd" in the window taskbar (assuming you are working on a Windows machine) and open the "Command Prompt".
-Use the "cd" command to navigate to the directory storing echo_client.py. Next, type "ipconfig"
-and look for the IP address listed under IPv4. Once obtained, in that same Command Prompt type: 
-```python ./echo_client.py (insert IP address here) (insert port number here)``` and hit enter. The client should
-then start running. If the server is already up and running it should connect promptly. Once connected, type in 
-numbers 1-3 to query a response from the server.
+Type in ```cmd``` in Windows Search (assuming you are working on a Windows machine) and open "Command Prompt".
+Use the ```cd``` command to navigate to the directory storing ```echo_client.py```. Then run the command: 
+```
+python ./echo_client.py <insert server IP address here> <insert port number here>
+```
+The client should then start running. If the server is already up and running it should connect properly. Once connected, type in ```1```, ```2```, or ```3``` to request some information from the server.
