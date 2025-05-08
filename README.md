@@ -28,6 +28,7 @@ be able to establish a connection with the database.
 Type in ```cmd``` in Windows Search (assuming you are working on a Windows machine) and open "Command Prompt".
 Use the ```cd``` command to navigate to the directory storing ```echo_client.py```. Then run the command: 
 ```
-python ./echo_client.py <insert server IP address here> <insert port number here>
+python ./echo_client.py
 ```
-The client should then start running. If the server is already up and running it should connect properly. Once connected, type in ```1```, ```2```, or ```3``` to request some information from the server.
+When prompted for input, enter the server IP address in the first input and the port number in the second input.
+Once these are inputted, the client should then start running. If the server is already up and running it should connect properly. Once connected, type in ```1```, ```2```, or ```3``` to request some information from the server.
